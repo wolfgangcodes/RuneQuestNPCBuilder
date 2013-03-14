@@ -1,0 +1,175 @@
+div{
+    margin: 3px;
+    /*border:#363636 solid 1px;*/
+}
+div.group {
+    float: left;
+}
+.text_style{
+    font-variant: small-caps;
+    font-size: 8pt;
+}
+/*-- Misc. */
+.clear_text {
+    display: table;
+    /*background-color: #d3d3d3;*/
+    /*margin: 5px;*/
+    /*padding: 3px;*/
+}
+
+.clear_text span, input {
+    text-align: center;
+}
+.choose_label{
+    width: 125px; /* or whatever size you want them */
+    font-variant: small-caps;
+    font-size: 8pt;
+    display: block;
+}
+.text_label {
+    width: 125px; /* or whatever size you want them */
+    font-variant: small-caps;
+    font-size: 8pt;
+    display: inline-block;
+    /*white-space:nowrap;*/
+}
+
+.text_value {
+    padding: 3px;
+    height: 100%;
+    vertical-align: text-bottom;
+    border: none;
+    /*border: #999999 solid 1px;;*/
+    border-bottom: #212121 solid 2px;
+    display: inline-block;
+    width: 50px; /* or whatever size you want them */
+    font-family: monospace;
+    font-size: 8pt;
+    /*background-color: #d3d3d3;*/
+}
+
+/*-- SKILLS*/
+.text_value_base, .text_value_current {
+    width: 25px;
+}
+
+.text_value_base, .text_value_bonus, .text_value_total {
+    width: 25px;
+}
+
+.text_value_base {
+    margin-right: 3px;
+}
+
+.text_value_bonus {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.text_value_total {
+    margin-left: 3px;
+}
+
+.text_label_header {
+    display: inline-block;
+    font-size: 8pt;
+    width: 122px !important;
+    font-style: italic;
+    font-variant: small-caps;
+    font-family: serif;
+    height: 100%;
+    vertical-align: text-bottom;
+}
+
+.text_value_base_header,
+.text_value_bonus_header,
+.text_value_total_header {
+    border: none !important;
+    /*margin-left:1px;*/
+    font-size: 8pt;
+    font-style: italic;
+    font-variant: small-caps;
+    font-family: serif;
+    width: 36px;
+    height: 100%;
+    vertical-align: text-bottom;
+
+}
+
+/*-- Hit Points*/
+.hit_points > .roll_label {
+    font-size: 8pt;
+    display: inline-block;
+    width: 38px !important;
+}
+
+.hit_points > .text_label {
+    width: 75px;
+    margin-left: 3px;
+}
+
+.hit_points > .roll_label,
+.hit_points > .text_value_hp,
+.hit_points > .text_value_ap,
+.hit_points > .text_value_current_hp {
+    width: 30px;
+}
+
+.hit_points > .text_value_hp,
+.hit_points > .text_value_ap {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+.hit_points > .text_value_current_hp {
+    margin-left: 5px;
+}
+
+.roll_label_header {
+    border: none !important;
+    font-size: 8pt;
+    font-style: italic;
+    font-variant: small-caps;
+    font-family: serif;
+    /*margin-left:5px;*/
+    margin-right: 30px;
+    display: inline-block;
+    padding: 0px;
+    width:10px;
+
+}
+.text_label_location_header{
+    margin-right:40px;
+    margin-left:0px !important;
+
+}
+.text_label_location_header,
+.text_value_hp_header,
+.text_value_ap_header,
+.text_value_current_hp_header {
+    padding: 0px;
+    border: none !important;
+    margin-left:10px;
+    font-size: 8pt;
+    font-style: italic;
+    font-variant: small-caps;
+    font-family: serif;
+    width: 34px;
+}
+.text_value_current_hp_header{
+    margin-left:10px;
+    margin-right:7px;
+    width:30px;
+}
+
+/*-- Background Info */
+.bonus_label{
+    text-align: left !important;
+}
+.bonus_value{
+    border: none;
+    font-family: serif;
+    font-style: italic;
+    vertical-align:baseline;
+
+}

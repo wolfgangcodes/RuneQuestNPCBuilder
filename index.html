@@ -1,0 +1,418 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html >
+<head >
+    <link rel="stylesheet" href="css/main.css" />
+
+    <script type="text/javascript" src="js/knockout-2.1.0.js" ></script >
+    <script type="text/javascript" src="js/knockout.mapping.js" ></script >
+    <script type="text/javascript" src="js/custom_knockout_binding.js" ></script >
+    <script type="text/javascript" src="js/jquery-1.7.2.min.js" ></script >
+    <script type="text/javascript" src="js/jquery-ui-1.8.20.custom.min.js" ></script >
+
+    <script type="text/javascript" src="js/dice.js" ></script >
+
+
+    <script type="text/javascript" src="js/util.js" ></script >
+    <script type="text/javascript" src="js/model.js" ></script >
+
+    <script type="text/javascript" src="js/data.js" ></script >
+    <script type="text/javascript" src="js/ranks.js" ></script >
+    <script type="text/javascript" src="js/backgrounds.js" ></script >
+    <script type="text/javascript" src="js/professions.js" ></script >
+
+
+    <script type="text/javascript" src="js/main.js" ></script >
+    <!--run main-->
+    <script type="text/javascript" >
+        $(document).ready(function () {
+            init()
+        })
+    </script >
+    <title >Rune Quest NPC Generator</title >
+</head >
+<body >
+<div class="group" >
+    <div id="general" >
+        <span class='clear_text' >
+            <label class='text_label age_label' for='player' >Player: </label >
+            <input id="player" type="text" class='text_value money_value' data-bind="value: player, valueUpdate: 'keyup'" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label age_label' for='name' >Name: </label >
+            <input id="name" type="text" class='text_value money_value' data-bind="value: name, valueUpdate: 'keyup'" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label age_label' for='gender' >Gender: </label >
+            <select id="gender" type="text" class='text_value money_value' data-bind="options:['Male','Female'], value: gender" ></select>
+        </span >
+
+        <span class='clear_text' >
+            <label class='text_label age_label' for='age' >Age: </label >
+            <input id="age" type="text" class='text_value money_value' data-bind="value: age()" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label money_label' for='money' >Money: </label >
+            <input id="money" type="text" class='text_value money_value' data-bind="value: (character.background() ? character.background().money() : 0)" /><span class="text_style">Sp</span>
+        </span >
+        <span class='clear_text' >
+            <label class='text_label age_label' for='rank' >Rank: </label >
+            <select id="rank" type="text" class='text_value money_value' data-bind="options:RANKS,  optionsText: 'name', value: rank" ></select>
+        </span >
+
+    </div >
+
+    <div id="background" >
+        <select data-bind="options: BACKGROUNDS.all, optionsText: 'name', value: BACKGROUNDS.selected, optionsCaption: 'Choose a background...'" ></select >
+
+        <!-- ko foreach: (character.background() != undefined  ? character.background().basic_skill_bonus : []) -->
+        <span class='clear_text' >
+            <span class='text_label bonus_label' data-bind="text: skill_name" ></span >
+            <span type="text" class='text_value bonus_value ' data-bind=" text: bonus+ '%'" ></span >
+        </span >
+        <!-- /ko-->
+
+        <!-- ko foreach: (character.background() != undefined  ? character.background().advanced_skill_bonus : []) -->
+        <span class='clear_text' >
+            <span class='text_label bonus_label' data-bind="text: skill_name" ></span >
+            <span type="text" class='text_value bonus_value ' data-bind="text:bonus > 0 ?  bonus+ '%' : '&nbsp;'" ></span >
+        </span >
+        <!-- /ko-->
+
+        <span id="background_basic_skill_choices" data-bind="foreach: (character.background() != undefined  ? character.background().basic_skill_choices : [])" >
+            <span class='clear_text' >
+                <span data-bind="visible: (number - selected_choices().length >0)" >
+
+                    <span class='choose_label' >Choose <span data-bind="text: number" ></span ></span >
+                    <select data-bind="options: available_bonuses,
+                           optionsText: function(item) {
+                                if(item.bonus > 0){
+                                    return  '+' + item.bonus + '% ' + item.skill_name;
+                                }else{
+                                    return  item.skill_name;
+                                }                            },
+                            value: currently_selected_choice
+                            " ></select >
+                    <button data-bind="enable: (number - selected_choices().length > 0), click: function(){
+                                    try{
+                                        add()
+                                    }catch(e){
+                                        console.log('Error Add', e)
+                                    }
+                                  }" >+
+                    </button >
+                </span >
+                <!-- ko foreach: selected_choices -->
+                <span class='clear_text' >
+                    <span class='text_label bonus_label' data-bind="text: skill_name" ></span >
+                    <span type="text" class='text_value bonus_value ' data-bind="text:bonus > 0 ?  bonus+ '%' : '&nbsp;'" ></span >
+                    <button data-bind="click: function(){
+                                    try{
+                                        $parent.remove(this)
+                                    }catch(e){
+                                        console.log('Error Remove:', e)
+                                    }
+                                  }" >-
+                    </button >
+                </span >
+
+                <!-- /ko -->
+            </span >
+        </span >
+
+        <span id="background_advanced_skill_choices" data-bind="foreach: (character.background() != undefined  ? character.background().advanced_skill_choices : [])" >
+            <span class='clear_text' >
+                <span data-bind="visible: (number - selected_choices().length >0)" >
+
+                    <span class='choose_label' >Choose
+                        <span data-bind="text: (number - selected_choices().length)" ></span ></span >
+                    <select data-bind="options: available_bonuses,
+                           optionsText: function(item) {
+                                if(item.bonus > 0){
+                                    return  '+' + item.bonus + '% ' + item.skill_name;
+                                }else{
+                                    return  item.skill_name;
+                                }
+                            },
+                            value: currently_selected_choice
+                            " ></select >
+                    <button data-bind="enable: (number - selected_choices().length > 0), click: function(){
+                                    try{
+                                        add()
+                                    }catch(e){
+                                        console.log('Error Add', e)
+                                    }
+                                  }" >+
+                    </button >
+                </span >
+                <!-- ko foreach: selected_choices -->
+                <span class='clear_text' >
+                    <span class='text_label bonus_label' data-bind="text: skill_name" ></span >
+                    <span type="text" class='text_value bonus_value ' data-bind="text:bonus > 0 ?  bonus+ '%' : '&nbsp;'" ></span >
+                    <button data-bind="click: function(){
+                                    try{
+                                        $parent.remove(this)
+                                    }catch(e){
+                                        console.log('Error Remove:', e)
+                                    }
+                                  }" >-
+                    </button >
+                </span >
+                <!-- /ko -->
+            </span >
+        </span >
+
+    </div >
+
+    <div id="profession" >
+        <select data-bind="options: PROFESSIONS.possible, optionsText: 'name', value: PROFESSIONS.selected, optionsCaption: 'Choose a profession...', enable: BACKGROUNDS.selected()" ></select >
+        <!-- ko foreach: (character.profession() != undefined  ? character.profession().basic_skill_bonus : []) -->
+        <span class='clear_text' >
+            <span class='text_label bonus_label' data-bind="text: skill_name" ></span >
+            <span type="text" class='text_value bonus_value ' data-bind=" text: bonus+ '%'" ></span >
+        </span >
+        <!-- /ko-->
+
+        <!-- ko foreach: (character.profession() != undefined  ? character.profession().advanced_skill_bonus : []) -->
+        <span class='clear_text' >
+            <span class='text_label bonus_label' data-bind="text: skill_name" ></span >
+            <span type="text" class='text_value bonus_value ' data-bind="text: character[_skill_name]().doubles_bonus() > 0 ?  character[_skill_name]().doubles_bonus()+ '%' : '&nbsp;'" ></span >
+        </span >
+        <!-- /ko-->
+
+        <span id="profession_skill_choices" data-bind="foreach: (character.profession() != undefined  ? character.profession().choices : [])" >
+            <span class='clear_text' >
+                <span data-bind="visible: (number - selected_choices().length >0)" >
+
+                    <span class='choose_label' >Choose <span data-bind="text: number" ></span ></span >
+                    <select data-bind="options: available_bonuses,
+                           optionsText: function(item) {
+                                if(item.bonus > 0){
+                                    return  '+' + item.bonus + '% ' + item.skill_name;
+                                }else{
+                                    return  item.skill_name;
+                                }                            },
+                            value: currently_selected_choice
+                            " ></select >
+                    <button data-bind="enable: (number - selected_choices().length > 0), click: function(){
+                                    try{
+                                        add()
+                                    }catch(e){
+                                        console.log('Error Add', e)
+                                    }
+                                  }" >+
+                    </button >
+                </span >
+
+                <!-- ko foreach: selected_choices -->
+                <span class='clear_text' >
+                    <span class='text_label bonus_label' data-bind="text: skill_name" ></span >
+                    <span type="text" class='text_value bonus_value ' data-bind="text:bonus > 0 ?  bonus+ '%' : '&nbsp;'" ></span >
+                    <button data-bind="click: function(){
+                                    try{
+                                        $parent.remove(this)
+                                    }catch(e){
+                                        console.log('Error Remove:', e)
+                                    }
+                                  }" >-
+                    </button >
+                </span >
+
+                <!-- /ko -->
+            </span >
+        </span >
+
+    </div >
+</div >
+<div class='group' >
+    <div id="characteristics" >
+        <!--Editable Characteristics-->
+        <span class='clear_text' >
+            <label class='text_label' for='str' >Str</label >
+            <input id="str" type="text" class='text_value' data-bind="value: str().value, valueUpdate: 'keyup'" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='con' >Con</label >
+            <input id="con" type="text" class='text_value' data-bind="value: con().value, valueUpdate: 'keyup'" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='dex' >Dex</label >
+            <input id="dex" type="text" class='text_value' data-bind="value: dex().value, valueUpdate: 'keyup'" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='siz' >Siz</label >
+            <input id="siz" type="text" class='text_value' data-bind="value: siz().value, valueUpdate: 'keyup'" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='int' >Int</label >
+            <input id="int" type="text" class='text_value' data-bind="value: int().value, valueUpdate: 'keyup'" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='pow' >Pow</label >
+            <input id="pow" type="text" class='text_value' data-bind="value: pow().value, valueUpdate: 'keyup'" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='cha' >Cha</label >
+            <input id="cha" type="text" class='text_value' data-bind="value: cha().value, valueUpdate: 'keyup'" />
+        </span >
+    </div >
+    <div id="derived_characteristics" >
+
+        <!--Derived Characteristics-->
+        <span class='clear_text' >
+            <label class='text_label' for='combat_actions' >Combat Actions</label >
+            <span id="combat_actions" class='text_value' data-bind="text: combat_actions" ></span >
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='dmg_mod' >Damage Modifier</label >
+            <span id="dmg_mod" class='text_value' data-bind="text: damage_modifier " ></span >
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='movement' >Movement</label >
+            <input id="movement" class='text_value' data-bind="value: movement" />
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='strike_rank' >Strike Rank</label >
+            <span id="strike_rank" class='text_value' data-bind="text: strike_rank" ></span >
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='armor_penalty' >Skill Penalty</label >
+            <span id="armor_penalty" class='text_value' data-bind="text: -1*armor_penalty()" ></span >
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='magic_points_total' >Magic Points</label >
+            <!--<span id="magic_points_current" class='text_value text_value_current' data-bind="text: magic_points().current()" ></span>-->
+            <span id="magic_points_total" class='text_value ' data-bind="text: magic_points().total().value()" ></span >
+        </span >
+        <span class='clear_text' >
+            <label class='text_label' for='hero_points' >Hero Points</label >
+            <span id="hero_points" class='text_value' data-bind="text: hero_points" ></span >
+        </span >
+    </div >
+
+    <div id="hit_points" >
+        <span class='clear_text hit_points' >
+            <span class='text_value roll_label_header' >Roll</span >
+            <span class='text_value text_label_location_header' >Location</span >
+            <span class='text_value text_value_hp_header' >HP</span >
+            <span class='text_value text_value_ap_header' >AP</span >
+            <span class='text_value text_value_current_hp_header' >Current</span >
+        </span >
+        <span class='clear_text hit_points' >
+            <label id="hp_left_leg_roll" class='roll_label' >1-3</label >
+            <label class='text_label' for='hp_left_leg_total' >Left Leg</label >
+            <span id="hp_left_leg_total" class='text_value text_value_hp' data-bind="text: hit_points_left_leg" ></span >
+            <input id="hp_left_leg_ap" class='text_value text_value_ap' data-bind="value: armor_points_left_leg, valueUpdate: 'keyup'" />
+            <span id="hp_left_leg_current" class='text_value text_value_current_hp' ></span >
+        </span >
+        <span class='clear_text hit_points' >
+            <label id="hp_right_leg_roll" class='roll_label' >4-6</label >
+            <label class='text_label' for='hp_right_leg_total' >Right Leg</label >
+            <span id="hp_right_leg_total" class='text_value text_value_hp' data-bind="text: hit_points_right_leg" ></span >
+            <input id="hp_right_leg_ap" class='text_value text_value_ap' data-bind="value: armor_points_right_leg, valueUpdate: 'keyup'" />
+            <span id="hp_right_leg_current" class='text_value text_value_current_hp' ></span >
+        </span >
+        <span class='clear_text hit_points' >
+            <label id="hp_abdomen_roll" class='roll_label' >7-9</label >
+            <label class='text_label' for='hp_left_leg_total' >Abdomen</label >
+            <span id="hp_abdomen_total" class='text_value text_value_hp' data-bind="text: hit_points_abdomen" ></span >
+            <input id="hp_abdomen_ap" class='text_value text_value_ap' data-bind="value: armor_points_abdomen, valueUpdate: 'keyup'" />
+            <span id="hp_abdomen_current" class='text_value text_value_current_hp' ></span >
+        </span >
+        <span class='clear_text hit_points' >
+            <label id="hp_chest_roll" class='roll_label' >10-12</label >
+            <label class='text_label' for='hp_left_leg_total' >Chest</label >
+            <span id="hp_chest_total" class='text_value text_value_hp' data-bind="text: hit_points_chest" ></span >
+            <input id="hp_chest_ap" class='text_value text_value_ap' data-bind="value: armor_points_chest, valueUpdate: 'keyup'" />
+            <span id="hp_chest_current" class='text_value text_value_current_hp' ></span >
+        </span >
+        <span class='clear_text hit_points' >
+            <label id="hp_left_arm_roll" class='roll_label' >13-15</label >
+            <label class='text_label' for='hp_left_arm_total' >Left Arm</label >
+            <span id="hp_left_arm_total" class='text_value text_value_hp' data-bind="text: hit_points_left_arm" ></span >
+            <input id="hp_left_arm_ap" class='text_value text_value_ap' data-bind="value: armor_points_left_arm, valueUpdate: 'keyup'" />
+            <span id="hp_left_arm_current" class='text_value text_value_current_hp' ></span >
+        </span >
+        <span class='clear_text hit_points' >
+            <label id="hp_right_arm_roll" class='roll_label' >16-18</label >
+            <label class='text_label' for='hp_right_arm_total' >Right Arm</label >
+            <span id="hp_right_arm_total" class='text_value text_value_hp' data-bind="text: hit_points_right_arm" ></span >
+            <input id="hp_right_arm_ap" class='text_value text_value_ap' data-bind="value: armor_points_right_arm, valueUpdate: 'keyup'" />
+            <span id="hp_right_arm_current" class='text_value text_value_current_hp' ></span >
+        </span >
+        <span class='clear_text hit_points' >
+            <label id="hp_head_roll" class='roll_label' >19-20</label >
+            <label class='text_label' for='hp_left_leg_total' >Head</label >
+            <span id="hp_head_total" class='text_value text_value_hp' data-bind="text: hit_points_head" ></span >
+            <input id="hp_head_ap" class='text_value text_value_ap' data-bind="value: armor_points_head, valueUpdate: 'keyup'" />
+            <span id="hp_head_current" class='text_value text_value_current_hp' ></span >
+        </span >
+    </div >
+</div >
+<div id="basic_skills" class='group' >
+
+    <span class='clear_text skill' >
+        <label class='text_label_header' >Name</label >
+        <span class='text_value text_value_base_header' >Base</span >
+        <span class='text_value text_value_bonus_header' >Bonus</span >
+        <span class='text_value text_value_total_header' >Total</span >
+    </span >
+    <!-- ko foreach: basic_skills -->
+    <span class='clear_text skill' >
+        <label class='text_label' data-bind="text: name" ></label >
+        <span class='text_value text_value_base' data-bind="text: total_base" ></span >
+        <span >+</span >
+        <span class='text_value text_value_bonus' data-bind="text: total_bonus" ></span >
+        <span >=</span >
+        <span class='text_value text_value_total' data-bind="text: total" ></span >
+    </span >
+    <!-- /ko -->
+
+</div >
+
+<div id="advanced_skills" class='group' >
+
+    <span class='clear_text advanced_skill' >
+        <label class='text_label_header' >Name</label >
+        <span class='text_value text_value_base_header' >Base</span >
+        <span class='text_value text_value_bonus_header' >Bonus</span >
+        <span class='text_value text_value_total_header' >Total</span >
+    </span >
+    <!-- ko foreach: advanced_skills -->
+    <!-- ko if:  known -->
+    <span class='clear_text skill' >
+        <label class='text_label' data-bind="text: name" ></label >
+        <span class='text_value text_value_base' data-bind="text: total_base" ></span >
+        <span >+</span >
+        <span class='text_value text_value_bonus' data-bind="text: total_bonus" ></span >
+        <span >=</span >
+        <span class='text_value text_value_total' data-bind="text: total" ></span >
+    </span >
+    <!-- /ko -->
+    <!-- /ko -->
+<!--</div >-->
+
+<!--<div id="runecasting_skills" class='group' >-->
+
+    <span class='clear_text runecasting_skill' >
+        <label class='text_label_header' >Name</label >
+        <span class='text_value text_value_base_header' >Base</span >
+        <span class='text_value text_value_bonus_header' >Bonus</span >
+        <span class='text_value text_value_total_header' >Total</span >
+    </span >
+    <!-- ko foreach: runecasting_skills -->
+    <!-- ko if:  known -->
+    <span class='clear_text skill' >
+        <label class='text_label' data-bind="text: name" ></label >
+        <span class='text_value text_value_base' data-bind="text: total_base" ></span >
+        <span >+</span >
+        <span class='text_value text_value_bonus' data-bind="text: total_bonus" ></span >
+        <span >=</span >
+        <span class='text_value text_value_total' data-bind="text: total" ></span >
+    </span >
+    <!-- /ko -->
+    <!-- /ko -->
+</div >
+
+</body >
+</html >
